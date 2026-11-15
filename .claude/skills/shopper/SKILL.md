@@ -453,7 +453,13 @@ bottom in these groups:
        - `benchmark{name,url,price,note,image,facts[{t,k}]}`
        - `finalists[]`, each with `name, meta, ribbon, top, image, price, listPrice, how, rating` (number or
          null), `ratingText, expert, facts[{t,k:"plus"|"minus"}], owners`, `codes[{code,text,status,label}]`,
-         `buyLabel, url`, `alt{label,url}`
+         `buyLabel, url`, `alt{label,url}`, `reviews[]`
+       - `reviews[{source,date,kind:"expert"|"owners",verdict,quote,summary,note,rating,negative,url}]`:
+         the page's **Reviews** popup shows at most 3, newest first. Use only real reviews gathered in the
+         review passes, each with its date (ISO, or null if undated) and a direct URL. Quotes must be verbatim
+         and short; otherwise use `summary`. Include a credible negative verdict if one exists
+         (`negative:true`), and flag reviews of a sibling variant in `note`. `product.reviews` works the same
+         in single-item mode.
        - `compare{cols[],groups[{name,rows[[label,[values],bestIndex]]}]}` (bestIndex `-1` = none)
        - `ruledOut[{name,url,image,why}]`, `ruledOutNote`, `warnings[]`, `unverified[]`, `sources[[name,url]]`
      - **Single-item searches** (the user wants one specific product, e.g. "find the best price on the
