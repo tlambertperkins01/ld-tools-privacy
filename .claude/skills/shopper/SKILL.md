@@ -308,6 +308,26 @@ Lead with the answer. Structure:
 
    | Product | Reviewed by (award) | Owner rating (★, confidence) | Pieces / key spec | Retailer | Price | Effective price | Evidence | Promo code (label) | Trust | Buy link |
 
+   **"What each one has" bullets.** When finalists differ in ways that matter
+   (construction such as 5-ply vs tri-ply, sizes or contents, materials, lid
+   type, oven or dishwasher rating, origin, warranty, returns), add a short
+   bullet block per product, benchmark included, right under the table:
+   - 3–6 bullets per product, with the facts only (e.g. "Tri-ply, aluminum core ·
+     8"/10" skillets · 6 qt deep sauté · steel lids · 500°F · Brazil").
+   - Put a ⭐ on an attribute **only** if it makes that product genuinely
+     superior to the others *on that attribute*, and only when the advantage
+     is real: backed by testing, physics, or an objective spec (the largest
+     pan, the highest oven rating, the longest return window, the only one
+     with steel lids). Marketing claims don't earn a star. More layers is
+     not automatically better: 5-ply holds heat and spreads it more evenly, but heats and
+     responds more slowly, so star it only if the user's priorities favour it.
+   - Mark real weaknesses with ⚠️ (e.g. "⚠️ skillets warped in Wirecutter's retest").
+   - If whether something is superior depends on how the user cooks (searing vs
+     sauces, induction, dishwasher use, needing a 12" skillet, weight or wrist
+     strain), **ask** in one short question with options (AskUserQuestion
+     where available) rather than guessing. Until they answer, show the
+     bullets without stars on the disputed attributes and say what each answer
+     would change.
 4. **Mix-and-match** builds, with arithmetic.
 5. **Sale timing**: announced deals + historical lows + wait-or-buy call.
 6. **Codes table**: code · savings · conditions · source · label
