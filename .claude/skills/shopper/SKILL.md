@@ -398,6 +398,21 @@ Don't redesign it unless the user asks.
 
 Publish one unified HTML page (Artifact tool) and give the link alongside a short chat summary. Read it top to
 bottom in these groups:
+0. **WAIT banner** (top of the page, and the first line of the chat summary), shown only when a
+   sale is likely within the next **14 days**. Show it when either:
+   - a major sale event (Black Friday/Cyber Monday, Prime Day, Memorial/Labor
+     Day, brand friends-and-family or anniversary sales) starts within 14 days, **and**
+     at least one finalist has dropped during that event before (exact SKU, a
+     dated source) or a deal for it is already announced; or
+   - a retailer or brand has announced a sale on a finalist starting within 14 days.
+
+   Content: the event and its start date with a day count · one line per
+   finalist with its past event low or announced deal (or "no past data") ·
+   **exceptions to buy now** (a code or price that expires before the sale,
+   low stock) · whether the retailer's price-adjustment policy covers buying now (only if
+   verified). Don't show the banner for vague "prices may drop" claims, and
+   delete the block entirely when the conditions aren't met. If waiting means losing a
+   time-limited deal, say which is likely cheaper.
 1. **Answer**: 2–3 lines (buy · cheapest · the key caveat).
 2. **Benchmark**: one card (if there is one).
 3. **Finalists**: one card each, all the same shape: product photo · name + model ·

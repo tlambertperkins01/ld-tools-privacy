@@ -23,7 +23,7 @@
 :root{
   --bg:#f3f5f6; --surface:#ffffff; --ink:#16212b; --muted:#5d6a74; --line:#dce2e6;
   --steel:#bcc6cd; --accent:#0f6b6f; --accent-soft:#e1f0f0; --photo:#f7f8f9;
-  --good:#1d7a46; --warn:#9a5a00; --bad:#b3261e; --gold:#b48600; --you:#6d47a3;
+  --wait-bg:#fff6e6; --good:#1d7a46; --warn:#9a5a00; --bad:#b3261e; --gold:#b48600; --you:#6d47a3;
   --display:"Archivo","Helvetica Neue",Arial,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -31,11 +31,11 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0f1519; --surface:#172027; --ink:#e7edf0; --muted:#9aa8b1; --line:#2b373f;
   --steel:#41505a; --accent:#56c4c7; --accent-soft:#173a3c; --photo:#eef1f3;
-  --good:#61cc8f; --warn:#e8a640; --bad:#f2807a; --gold:#e6bf45; --you:#b896ea; color-scheme:dark}}
+  --wait-bg:#2a2112; --good:#61cc8f; --warn:#e8a640; --bad:#f2807a; --gold:#e6bf45; --you:#b896ea; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f1519; --surface:#172027; --ink:#e7edf0; --muted:#9aa8b1; --line:#2b373f;
   --steel:#41505a; --accent:#56c4c7; --accent-soft:#173a3c; --photo:#eef1f3;
-  --good:#61cc8f; --warn:#e8a640; --bad:#f2807a; --gold:#e6bf45; --you:#b896ea; color-scheme:dark}
+  --wait-bg:#2a2112; --good:#61cc8f; --warn:#e8a640; --bad:#f2807a; --gold:#e6bf45; --you:#b896ea; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
 .wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px;display:grid;gap:44px}
@@ -54,6 +54,13 @@ section{display:grid;gap:16px;min-width:0}
 .sec-head .eyebrow{color:var(--accent)}
 code{font-family:var(--mono);font-size:.85em;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px;white-space:nowrap}
 
+/* wait banner: shown only when a likely sale starts within 14 days */
+.wait{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:var(--wait-bg);border:2px solid var(--warn);border-radius:12px;padding:16px 18px}
+.wait .sign{font-family:var(--display);font-weight:800;font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--surface);background:var(--warn);border-radius:6px;padding:6px 10px;white-space:nowrap}
+.wait h2{font-size:1.1rem}
+.wait ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px;font-size:.92rem}
+.wait .except{margin-top:8px;font-size:.9rem}
+@media (max-width:560px){.wait{grid-template-columns:1fr}}
 /* 1. answer */
 .answer{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px}
 .answer ol{margin:0;padding:0;list-style:none;display:grid;gap:10px}
@@ -150,10 +157,23 @@ footer{color:var(--muted);font-size:.8rem;display:grid;gap:6px}
 <header style="display:grid;gap:12px">
   <div class="eyebrow">Stainless cookware sets · Nov 15, 2026</div>
   <h1>Beat the Quince 5-ply at $399.90</h1>
+  <!-- WAIT BANNER: include only when a sale likely to lower a finalist's price starts within 14 days. Otherwise delete this block. -->
+  <aside class="wait" role="note" aria-label="Wait for a sale">
+    <span class="sign">Wait</span>
+    <div>
+      <h2>Black Friday starts Nov 27, in 12 days</h2>
+      <ul>
+        <li><b>Tramontina:</b> the Costco version has dropped to $189.99 before (vs $239.99 now). Amazon's price may dip further.</li>
+        <li><b>Cuisinart:</b> sold for about $150 at Kohl's during Black Friday 2024.</li>
+        <li><b>Henckels / Goldilocks:</b> no past Black Friday data. A sitewide sale is possible but not announced.</li>
+      </ul>
+      <p class="except"><b>Exception, buy now:</b> if you want the Cuisinart, <code>FRIEND20</code> ($243.46) ends <b>Nov 17</b>, before Black Friday starts.</p>
+    </div>
+  </aside>
   <div class="answer">
     <ol>
       <li><b>Buy</b><span><a href="https://www.amazon.com/dp/B00JDL2GXG">Tramontina Tri-Ply Clad 12-pc</a> on Amazon for <span class="num">$299.95</span>. That's $100 less for more pans, and it's the most widely recommended set.</span></li>
-      <li><b>Cheapest</b><span><a href="https://www.surlatable.com/pro-8223935-set-12pc-multiclad-pro/PRO-8223935.html">Cuisinart MultiClad Pro 12-pc</a>: <span class="num">$243.46</span> at Sur La Table with <code>FRIEND20</code>, until <b style="font-family:inherit;letter-spacing:0;text-transform:none;color:inherit">Nov 17</b>.</span></li>
+      <li><b>Cheapest</b><span><a href="https://www.surlatable.com/pro-8223935-set-12pc-multiclad-pro/PRO-8223935.html">Cuisinart MultiClad Pro 12-pc</a>: <span class="num">$243.46</span> at Sur La Table with <code>FRIEND20</code>, until <strong>Nov 17</strong>.</span></li>
       <li><b>5-ply?</b><span>No 5-ply set with credible reviews comes in under $399.90. For quick everyday cooking, tri-ply is the better fit anyway.</span></li>
     </ol>
   </div>
