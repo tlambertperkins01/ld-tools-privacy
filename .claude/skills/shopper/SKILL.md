@@ -100,9 +100,47 @@ If the benchmark page hides specs (JS-rendered), get them via search snippets,
 the same product on another region's site, or a browser render. **Never compare
 against a benchmark you haven't spec'd** — the piece list decides "similar."
 
-Ask the user only if a hard constraint is genuinely ambiguous and changes the
-answer (e.g. "is tri-ply acceptable or must it be 5-ply?"). Otherwise choose
-the sensible default, state it, and flag the trade-off in the output.
+### 0b. Intake question pass (mandatory, once per search)
+
+Every search gets **one** round of questions about what matters, asked early,
+so stars, rankings and the recommendation match how the user will actually
+use the product.
+
+1. **Use context first.** Before asking, gather what's already known: the
+   request itself, the benchmark's specs, earlier answers in this conversation,
+   saved preferences and memory, and the **standing profile** below. Don't ask
+   anything that context already answers. Say in one line what you inferred
+   ("assuming induction isn't a factor since all finalists support it").
+2. **Ask 2–4 questions**, tailored to the category, in a single
+   AskUserQuestion call (or one compact message if that tool isn't available).
+   - Only ask what changes the ranking or the stars: use pattern (e.g. how
+     they cook, how often), must-have sizes or features, deal-breakers
+     (materials, glass lids, origin, weight), care (dishwasher), compatibility
+     (cooktop, phone ecosystem, room size), and how much to trade price
+     against quality.
+   - Give 2–4 concrete options each, explain the trade-off in the option
+     text, put a recommended default first, and allow multi-select where
+     choices combine.
+   - Example for cookware: cooking style (high-heat searing vs quick everyday) ·
+     must-have pieces (12" skillet, big stockpot) · care (dishwasher) ·
+     deal-breakers (glass lids).
+3. **Don't block the work.** Send the questions right after locking the brief, and
+   start the discovery and pricing agents whose work doesn't depend on the
+   answers. Apply the answers when pruning, rating and starring.
+4. **"Any is okay"** or no preference means no stars on those attributes. Don't
+   re-ask.
+5. Ask again later only if a genuinely new fork appears that the first round
+   couldn't have anticipated. Keep it to one question.
+
+**Standing profile** (applies to every search; edit as preferences change):
+- Not eligible for student, education, military/veteran, first-responder or
+  healthcare discounts. Never propose them (see step 4).
+- Wants direct product links for everything shown.
+- Prefers depth over speed: big and small retailers, credible reviews only.
+
+Beyond the intake pass, ask only if a hard constraint is genuinely ambiguous
+and changes the answer. Otherwise choose the sensible default, state it, and
+flag the trade-off in the output.
 
 ---
 

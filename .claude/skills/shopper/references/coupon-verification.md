@@ -100,6 +100,13 @@ Asking for working codes is consent to try codes in the voucher field. Nothing p
 3. **Find the voucher field.** Look in the cart drawer, the cart page, or the
    collapsed order summary at checkout. On Shopify, `/checkout` works as a guest;
    no email is needed to apply a code.
+   **Control first:** apply one obviously fake code (e.g. `ZZFAKE999`) and
+   record the message. If real codes get the *same* message, the site can't
+   tell an invalid code from an excluded product, so report that ambiguity.
+   (Seen in testing: Made In said "Not Applicable" to everything, and the set
+   page said "Additional discounts do not apply".) Count the control
+   toward the 20-attempt limit. Also read the product page for "no additional
+   discounts" text before testing.
 4. **Enter one code at a time**, at least 3 s apart:
    1. Locate the voucher **textbox** and its **Apply** button. Confirm the
       textbox is *not* the zip, address or email field.
