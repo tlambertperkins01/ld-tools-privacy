@@ -445,6 +445,10 @@ bottom in these groups:
      Use the ArtifactData tool to `set` one document in collection `watches`, with
      doc_id `<slug>-<event>-<year>`, and these fields:
      - `title`, `category`, `status:"waiting"`, `target`
+     - `taskIds[]`: the scheduled task id(s) from `create_trigger`. The page's **Purchased** button
+       uses these to switch the tasks off through the Claude Code Remote connector.
+     - `image`, `imageAlt`: the best option's photo as a ~560px WebP data URI (same rules as the
+       report photos) for the landing tile
      - `benchmark{name,price,url}`, `bestNow{name,price,retailer,url}`
      - `saleEvent{name,start,end}` (ISO dates), `schedule` (human text), `nextCheck` (ISO), `stopDate`
      - `reportUrl` (this run's report), `taskName`, `summary`, `updatedAt`
@@ -455,11 +459,19 @@ bottom in these groups:
      `{watchId, at, headline, changes[], noChange}`. Write both in one `batch`.
    - The scheduled task's prompt must also say:
      - **Step 1:** read its watch doc. If its status is `bought` or `ended` (the user
-       clicked a button on the page) or the stop date has passed, disable itself and mark the doc ended.
+       pressed **Purchased** or **Stop watching**, which archives the search) or the stop date has passed,
+       disable itself and mark the doc ended. Never overwrite `purchased`. Statuses:
+       `waiting` · `buy-now` · `purchased` · `ended`. `purchased` and `ended` show in the page's Archive.
      - **Step 2:** after every run, `update` the doc (pinning `if_version`) with new
        items, bestNow, summary, updatedAt and nextCheck. Set status to `buy-now` when a finalist hits
        its past low or a deal is about to end. Then add a `checks` entry `<date>-<slug>`.
+     - Leave `image`, `imageAlt` and `taskIds` untouched. If an update hits a version conflict (the user
+       may have just pressed Purchased), re-read the doc and apply the stop rules first.
      - **If ArtifactData is unavailable**, say so in its report.
+   - The watchlist page itself: a landing view with every active search as a tile (photo, status,
+     best price vs target, sale countdown, next check), plus an Archive. Tap a tile to open `#w-<id>`,
+     which shows full prices, the log and the Purchased / Stop watching buttons. Don't
+     redesign or republish it during a search; only write data to it.
    - Confirm to the user what was created: how often, the time, and the stop date,
      plus the watchlist link.
      Call it a "scheduled task", never a trigger or cron job. If the tool is
