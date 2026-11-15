@@ -447,8 +447,19 @@ bottom in these groups:
      - `title`, `category`, `status:"waiting"`, `target`
      - `taskIds[]`: the scheduled task id(s) from `create_trigger`. The page's **Purchased** button
        uses these to switch the tasks off through the Claude Code Remote connector.
-     - `image`, `imageAlt`: the best option's photo as a ~560px WebP data URI (same rules as the
-       report photos) for the landing tile
+     - `image`, `imageAlt`: the best option's photo for the landing tile
+     - `report`: the full research, rendered in the search's detail view. Fields:
+       - `asOf`, `useCase`, `answer[{k,text,url}]`, `wait{title,lines[],exception}` (omit when not a WAIT)
+       - `benchmark{name,url,price,note,image,facts[{t,k}]}`
+       - `finalists[]`, each with `name, meta, ribbon, top, image, price, listPrice, how, rating` (number or
+         null), `ratingText, expert, facts[{t,k:"plus"|"minus"}], owners`, `codes[{code,text,status,label}]`,
+         `buyLabel, url`, `alt{label,url}`
+       - `compare{cols[],groups[{name,rows[[label,[values],bestIndex]]}]}` (bestIndex `-1` = none)
+       - `ruledOut[{name,url,image,why}]`, `ruledOutNote`, `warnings[]`, `unverified[]`, `sources[[name,url]]`
+     - **Photos:** never put image data in the database. Each document is capped at 256 KiB, and photos
+       fill it fast. Upload the ~560px WebP files once with the Artifact tool
+       (`asset: true`, `file_paths`, `url` = the watchlist), then store each returned `/_blob/<id>`
+       path in `image` fields.
      - `benchmark{name,price,url}`, `bestNow{name,price,retailer,url}`
      - `saleEvent{name,start,end}` (ISO dates), `schedule` (human text), `nextCheck` (ISO), `stopDate`
      - `reportUrl` (this run's report), `taskName`, `summary`, `updatedAt`
@@ -465,12 +476,14 @@ bottom in these groups:
      - **Step 2:** after every run, `update` the doc (pinning `if_version`) with new
        items, bestNow, summary, updatedAt and nextCheck. Set status to `buy-now` when a finalist hits
        its past low or a deal is about to end. Then add a `checks` entry `<date>-<slug>`.
-     - Leave `image`, `imageAlt` and `taskIds` untouched. If an update hits a version conflict (the user
+     - Leave `image`, `imageAlt`, `taskIds` and `report` untouched (live prices go in `items`). If an update hits a version conflict (the user
        may have just pressed Purchased), re-read the doc and apply the stop rules first.
      - **If ArtifactData is unavailable**, say so in its report.
    - The watchlist page itself: a landing view with every active search as a tile (photo, status,
      best price vs target, sale countdown, next check), plus an Archive. Tap a tile to open `#w-<id>`,
-     which shows full prices, the log and the Purchased / Stop watching buttons. Don't
+     which shows the WAIT banner, answer, live prices, the full `report` (benchmark, finalist
+     cards with owner ★ ratings, expert badges, ★/⚠ facts and codes, quick compare, ruled out,
+     warnings), the log, sources and the Purchased / Stop watching buttons. Don't
      redesign or republish it during a search; only write data to it.
    - Confirm to the user what was created: how often, the time, and the stop date,
      plus the watchlist link.
