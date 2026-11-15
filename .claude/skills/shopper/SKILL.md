@@ -456,6 +456,19 @@ bottom in these groups:
          `buyLabel, url`, `alt{label,url}`
        - `compare{cols[],groups[{name,rows[[label,[values],bestIndex]]}]}` (bestIndex `-1` = none)
        - `ruledOut[{name,url,image,why}]`, `ruledOutNote`, `warnings[]`, `unverified[]`, `sources[[name,url]]`
+     - **Single-item searches** (the user wants one specific product, e.g. "find the best price on the
+       Sony WH-1000XM6"): set `report.mode:"single"` and focus on **retailers, price and sale data**.
+       Keep review data to one line (owner ★ + one expert badge). Fields:
+       - `product{name,model,url,image,rating,ratingText,expert,facts[]}`
+       - `retailers[{name,url,price,listPrice,shipping,stock:"in"|"low"|"out",code,codeStatus,codeLabel,
+         effective,trust:"trusted"|"mixed"|"risky",trustLabel}]`
+       - `priceHistory{now,nowNote,typical,typicalNote,low,lowNote,list,listNote,notes[],sourceName,sourceUrl}`
+       - `deals[{when,title,detail,url,confirmed}]`, `alternatives[{name,url,image,why}]`, plus `answer`,
+         `wait`, `warnings`, `unverified`, `sources` as above
+
+       In this mode, skip the review-sweep and review-rating passes beyond one owner-rating lookup.
+       Spend the agents on the retailer sweep (big and small), codes, price history and sale outlook. The
+       same single-item layout applies to the chat summary and the standalone report.
      - **Photos:** never put image data in the database. Each document is capped at 256 KiB, and photos
        fill it fast. Upload the ~560px WebP files once with the Artifact tool
        (`asset: true`, `file_paths`, `url` = the watchlist), then store each returned `/_blob/<id>`
