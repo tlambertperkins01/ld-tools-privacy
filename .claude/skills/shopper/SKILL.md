@@ -439,7 +439,29 @@ bottom in these groups:
      (`update_trigger enabled=false`) once the sale window has ended (default:
      3 days after the event's last day) or once the user buys, and to send a
      final summary.
-   - Confirm to the user what was created: how often, the time, and the stop date.
+   - **Add it to the user's watchlist page**, "Waiting On":
+     https://claude.ai/artifact/FLYkd9RBwTa9YfwFBiYJvY. That is the one place the user
+     tracks every wait. Never create a second watchlist; add to this one.
+     Use the ArtifactData tool to `set` one document in collection `watches`, with
+     doc_id `<slug>-<event>-<year>`, and these fields:
+     - `title`, `category`, `status:"waiting"`, `target`
+     - `benchmark{name,price,url}`, `bestNow{name,price,retailer,url}`
+     - `saleEvent{name,start,end}` (ISO dates), `schedule` (human text), `nextCheck` (ISO), `stopDate`
+     - `reportUrl` (this run's report), `taskName`, `summary`, `updatedAt`
+     - `items[]`: one per finalist with `name, retailer, url, price, effective, trend, low, lowNote, code,
+       codeStatus` (`works|rejected|unchecked|your-step|none`) and `codeStatusLabel`
+
+     Also add a starting entry in `checks`:
+     `{watchId, at, headline, changes[], noChange}`. Write both in one `batch`.
+   - The scheduled task's prompt must also say:
+     - **Step 1:** read its watch doc. If its status is `bought` or `ended` (the user
+       clicked a button on the page) or the stop date has passed, disable itself and mark the doc ended.
+     - **Step 2:** after every run, `update` the doc (pinning `if_version`) with new
+       items, bestNow, summary, updatedAt and nextCheck. Set status to `buy-now` when a finalist hits
+       its past low or a deal is about to end. Then add a `checks` entry `<date>-<slug>`.
+     - **If ArtifactData is unavailable**, say so in its report.
+   - Confirm to the user what was created: how often, the time, and the stop date,
+     plus the watchlist link.
      Call it a "scheduled task", never a trigger or cron job. If the tool is
      unavailable, say so and give the user a reminder date to re-run `/shopper`.
 1. **Answer**: 2–3 lines (buy · cheapest · the key caveat).
