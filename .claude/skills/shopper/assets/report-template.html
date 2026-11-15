@@ -1,0 +1,402 @@
+<!--
+  /shopper report template: worked example (stainless cookware, Nov 2026).
+  HOW TO REUSE
+  - Keep the structure, CSS tokens, and section order: Answer → Benchmark → Finalists (cards) →
+    Price chart → Quick compare → Ruled out → Timing & warnings → Sources.
+  - Replace all product content. Every product name links to its exact product page.
+  - Images: {{key}} placeholders are replaced with data URIs (≈560px WebP) by a small script;
+    use the "No photo" placeholder (<span class="noimg">) when none is available.
+  - Chart: edit the `data` array in the script (list, eff, note; b:true = benchmark; f:true = faded/ruled out)
+    and set MAX to just above the highest price and BENCH to the benchmark price (or remove the line if none).
+  - Card ribbons: "Best overall" on the recommended card (class "card top"), "Lowest price" on the cheapest.
+  - Facts: li.plus = ★ (evidence-backed advantage), li.minus = ⚠ (known weakness).
+  - Status pills: p-ok ✅ works · p-bad ❌ rejected · p-mute ⚪/none · p-you 👤 user's step.
+  - One preview check before publishing; keep the page well under 1 MB.
+-->
+<title>Stainless Set Shortlist</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: read top-down in four groups. 1 the answer, 2 the benchmark, 3 the finalists as equal cards, 4 everything ruled out. Charts and details come after the cards. */
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --ink:#16212b; --muted:#5d6a74; --line:#dce2e6;
+  --steel:#bcc6cd; --accent:#0f6b6f; --accent-soft:#e1f0f0; --photo:#f7f8f9;
+  --good:#1d7a46; --warn:#9a5a00; --bad:#b3261e; --gold:#b48600; --you:#6d47a3;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1519; --surface:#172027; --ink:#e7edf0; --muted:#9aa8b1; --line:#2b373f;
+  --steel:#41505a; --accent:#56c4c7; --accent-soft:#173a3c; --photo:#eef1f3;
+  --good:#61cc8f; --warn:#e8a640; --bad:#f2807a; --gold:#e6bf45; --you:#b896ea; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1519; --surface:#172027; --ink:#e7edf0; --muted:#9aa8b1; --line:#2b373f;
+  --steel:#41505a; --accent:#56c4c7; --accent-soft:#173a3c; --photo:#eef1f3;
+  --good:#61cc8f; --warn:#e8a640; --bad:#f2807a; --gold:#e6bf45; --you:#b896ea; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px;display:grid;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.3rem;font-weight:800}
+h3{font-size:1.08rem;font-weight:600}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+p{margin:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:68ch}
+section{display:grid;gap:16px;min-width:0}
+.sec-head{display:grid;gap:4px}
+.sec-head .eyebrow{color:var(--accent)}
+code{font-family:var(--mono);font-size:.85em;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 5px;white-space:nowrap}
+
+/* 1. answer */
+.answer{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:14px}
+.answer ol{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.answer li{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:baseline}
+.answer li b{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:500}
+@media (max-width:560px){.answer li{grid-template-columns:1fr;gap:2px}}
+
+/* product cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px}
+.card>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:grid;grid-template-rows:auto auto 1fr auto;min-width:0}
+.card.top{border:2px solid var(--accent)}
+.ph{background:var(--photo);aspect-ratio:16/10;display:grid;place-items:center;position:relative;max-width:100%}
+.ph img{width:100%;height:100%;object-fit:contain;padding:10px;display:block}
+.ph .ribbon{position:absolute;left:10px;top:10px;background:var(--accent);color:var(--surface);font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.ph .noimg{font-size:.8rem;color:#5d6a74}
+.ph .inset{position:absolute;right:8px;bottom:8px;width:34%;aspect-ratio:4/3;background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ph .inset img{padding:2px;object-fit:cover}
+.c-head{padding:14px 16px 0;display:grid;gap:6px}
+.c-head .meta{font-size:.8rem;color:var(--muted)}
+.price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price .big{font-family:var(--display);font-size:1.7rem;font-weight:800}
+.price s{color:var(--muted);font-family:var(--mono);font-size:.85rem}
+.price .how{font-size:.8rem;color:var(--muted)}
+.c-body{padding:10px 16px 0;display:grid;gap:10px;align-content:start}
+.rating{display:flex;align-items:center;gap:8px;font-size:.84rem;flex-wrap:wrap}
+.stars{color:var(--gold);font-family:var(--mono);letter-spacing:1px;font-size:.95rem}
+.badge{font-size:.8rem;background:var(--accent-soft);color:var(--ink);border-radius:6px;padding:5px 8px}
+.facts{margin:0;padding:0;list-style:none;display:grid;gap:5px;font-size:.88rem}
+.facts li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:4px}
+.facts li::before{content:"·";color:var(--muted);text-align:center}
+.facts li.plus::before{content:"★";color:var(--gold)}
+.facts li.minus::before{content:"⚠";color:var(--warn)}
+.c-foot{padding:12px 16px 16px;margin-top:12px;border-top:1px solid var(--line);display:grid;gap:6px;font-size:.84rem}
+.c-foot .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pill{display:inline-block;font-family:var(--mono);font-size:.7rem;padding:1px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.p-ok{color:var(--good)} .p-bad{color:var(--bad)} .p-mute{color:var(--muted)} .p-you{color:var(--you)}
+.buy{display:inline-block;margin-top:4px;font-weight:600}
+
+/* benchmark: horizontal card */
+.bench{display:grid;grid-template-columns:minmax(0,220px) 1fr;gap:0;background:var(--surface);border:1px dashed var(--muted);border-radius:12px;overflow:hidden}
+.bench .ph{aspect-ratio:auto;min-height:100%}
+.bench .inner{padding:16px 18px;display:grid;gap:8px;align-content:start}
+@media (max-width:620px){.bench{grid-template-columns:1fr}.bench .ph{aspect-ratio:4/3}}
+
+/* ruled out: compact rows */
+.outs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.out{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
+.out .ph{aspect-ratio:1;border-radius:6px;overflow:hidden}
+.out .ph img{padding:4px}
+.out h3{font-size:.95rem}
+.out p{font-size:.84rem;color:var(--muted)}
+
+/* chart */
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:2px;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-bottom:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:2px;display:inline-block}
+.row{display:grid;grid-template-columns:minmax(140px,200px) 1fr;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.row .lbl{font-size:.88rem;font-weight:500}
+.track{position:relative;height:40px}
+.bar{position:absolute;left:0;top:4px;height:14px;border-radius:3px;background:var(--steel)}
+.bar.eff{background:var(--accent)}
+.row.faded{opacity:.55}
+.row.benchrow .bar{background:var(--muted)}
+.val{position:absolute;top:21px;left:0;font-size:.76rem;white-space:nowrap}
+.bline{position:absolute;top:-6px;bottom:-6px;border-left:2px dashed var(--bad)}
+.axis{display:grid;grid-template-columns:minmax(140px,200px) 1fr;gap:12px;font-size:.72rem;color:var(--muted)}
+.ticks{position:relative;height:18px}
+.ticks span{position:absolute;transform:translateX(-50%)}
+.ticks span:first-child{transform:none}
+@media (max-width:560px){.row,.axis{grid-template-columns:1fr}.axis>span:first-child{display:none}.row{gap:0}}
+
+/* quick compare */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:.88rem}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--display);font-weight:600}
+tbody th{font-family:var(--mono);font-weight:500;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+td.best{background:var(--accent-soft);font-weight:600}
+tr.grp th{background:var(--bg);color:var(--ink);font-family:var(--display);font-size:.8rem;letter-spacing:.04em}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:10px;min-width:0}
+.note ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:.9rem}
+.note.alert{border-color:var(--bad)}
+.note.alert h3{color:var(--bad)}
+footer{color:var(--muted);font-size:.8rem;display:grid;gap:6px}
+</style>
+
+<div class="wrap">
+
+<!-- 1. ANSWER -->
+<header style="display:grid;gap:12px">
+  <div class="eyebrow">Stainless cookware sets · Nov 15, 2026</div>
+  <h1>Beat the Quince 5-ply at $399.90</h1>
+  <div class="answer">
+    <ol>
+      <li><b>Buy</b><span><a href="https://www.amazon.com/dp/B00JDL2GXG">Tramontina Tri-Ply Clad 12-pc</a> on Amazon for <span class="num">$299.95</span>. That's $100 less for more pans, and it's the most widely recommended set.</span></li>
+      <li><b>Cheapest</b><span><a href="https://www.surlatable.com/pro-8223935-set-12pc-multiclad-pro/PRO-8223935.html">Cuisinart MultiClad Pro 12-pc</a>: <span class="num">$243.46</span> at Sur La Table with <code>FRIEND20</code>, until <b style="font-family:inherit;letter-spacing:0;text-transform:none;color:inherit">Nov 17</b>.</span></li>
+      <li><b>5-ply?</b><span>No 5-ply set with credible reviews comes in under $399.90. For quick everyday cooking, tri-ply is the better fit anyway.</span></li>
+    </ol>
+  </div>
+</header>
+
+<!-- 2. BENCHMARK -->
+<section>
+  <div class="sec-head"><span class="eyebrow">What you're trying to beat</span><h2>The benchmark</h2></div>
+  <article class="bench">
+    <div class="ph"><img src="{{quince}}" alt="Quince 5-ply stainless 10-piece set"></div>
+    <div class="inner">
+      <h3><a href="https://www.quince.com/en-us/home/5-ply-stainless-steel-10-piece-set">Quince Fully Clad 5-Ply 10-pc</a></h3>
+      <div class="price"><span class="big num">$399.90</span><span class="how">$379.90 with a friend's referral link · no codes exist</span></div>
+      <ul class="facts">
+        <li>8" & 10" skillets · 2 & 3 qt saucepans · 3 qt sauté · 8 qt stockpot</li>
+        <li>5-ply · steel lids · 500°F · made in Italy</li>
+        <li class="plus">365-day returns, the longest of the group</li>
+        <li class="minus">5-ply responds more slowly to heat changes, which works against quick everyday cooking</li>
+        <li class="minus">No independent test (Wirecutter excludes 5-ply sets)</li>
+      </ul>
+    </div>
+  </article>
+</section>
+
+<!-- 3. FINALISTS -->
+<section>
+  <div class="sec-head"><span class="eyebrow">All four beat $399.90</span><h2>The finalists</h2>
+    <p class="lede"><span style="color:var(--gold)">★</span> means better than the others on that point for quick everyday cooking. <span style="color:var(--warn)">⚠</span> marks a weakness. All four are tri-ply.</p></div>
+  <div class="cards">
+
+    <article class="card top">
+      <div class="ph"><span class="ribbon">Best overall</span><img src="{{tram}}" alt="Tramontina Tri-Ply Clad 12-piece set"></div>
+      <div class="c-head">
+        <h3>Tramontina Tri-Ply Clad 12-pc</h3>
+        <span class="meta">Model 80116/249DS · Amazon</span>
+        <div class="price"><span class="big num">$299.95</span><s>$399.95</s></div>
+      </div>
+      <div class="c-body">
+        <div class="rating"><span class="stars">★★★★½</span><span>4.5 owners · ~2,400 reviews</span></div>
+        <div class="badge">Wirecutter top pick · CNN · Food Network</div>
+        <ul class="facts">
+          <li class="plus">Most pans: 7 pots and pans, 5 lids</li>
+          <li class="plus">Biggest capacity: 6 qt deep sauté, 8 qt stock (20.5 qt total)</li>
+          <li>1.5, 2 & 3 qt saucepans · 8" & 10" skillets</li>
+          <li>Steel lids · 500°F · made in Brazil</li>
+          <li class="minus">Tarnishes over time · no 12" skillet</li>
+        </ul>
+      </div>
+      <div class="c-foot">
+        <span class="lbl">Best code</span>
+        <span>None on Amazon <span class="pill p-mute">none exist</span></span>
+        <span>Wayfair: ~10% off a first order with signup, about $270 <span class="pill p-you">👤 signup</span></span>
+        <a class="buy" href="https://www.amazon.com/dp/B00JDL2GXG">View on Amazon →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="ph"><span class="ribbon">Lowest price</span><img src="{{cuis}}" alt="Cuisinart MultiClad Pro 12-piece set"></div>
+      <div class="c-head">
+        <h3>Cuisinart MultiClad Pro 12-pc</h3>
+        <span class="meta">MCP-12N · Sur La Table</span>
+        <div class="price"><span class="big num">$243.46</span><s>$303.45</s><span class="how">with code, incl. $3.50 handling</span></div>
+      </div>
+      <div class="c-body">
+        <div class="rating"><span class="stars">★★★★☆</span><span>4.0 owners · ~4,300 reviews</span></div>
+        <div class="badge">Reviewed.com "Best Value"</div>
+        <ul class="facts">
+          <li class="plus">Lowest price, about $41 per pan</li>
+          <li>1.5 & 3 qt saucepans · 3.5 qt sauté · 8 qt stock · 8" & 10" skillets</li>
+          <li>Steel lids · 500°F · made in China</li>
+          <li class="minus">Skillets warped in Wirecutter's high-heat retest</li>
+          <li class="minus">The steamer insert and its lid count as 2 of the 12 pieces</li>
+        </ul>
+      </div>
+      <div class="c-foot">
+        <span class="lbl">Best code</span>
+        <span><code>FRIEND20</code> 20% off · ends Nov 17 <span class="pill p-ok">✅ official</span></span>
+        <a class="buy" href="https://www.surlatable.com/pro-8223935-set-12pc-multiclad-pro/PRO-8223935.html">View at Sur La Table →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="ph"><img src="{{henckels}}" alt="Henckels Clad H3 10-piece set"></div>
+      <div class="c-head">
+        <h3>Henckels Clad H3 10-pc</h3>
+        <span class="meta">Model 1023647 · Henckels.com</span>
+        <div class="price"><span class="big num">$299.99</span><span class="how">$254.99 with signup offer</span></div>
+      </div>
+      <div class="c-body">
+        <div class="rating"><span class="stars" style="color:var(--muted)">—</span><span>Too few reviews (Target 4.7 from 18)</span></div>
+        <div class="badge">Consumer Reports · best sets under $300</div>
+        <ul class="facts">
+          <li class="plus">Only set rated dishwasher-safe</li>
+          <li>Consumer Reports: "excellent" evenness and heating speed</li>
+          <li>1 & 2 qt saucepans · 3 qt sauté · 6 qt Dutch oven · 8" & 10" skillets</li>
+          <li class="minus">Glass lids can crack</li>
+          <li class="minus">Smallest pots: 12 qt total, no 8 qt stockpot</li>
+        </ul>
+      </div>
+      <div class="c-foot">
+        <span class="lbl">Best code</span>
+        <span>15% off with newsletter signup <span class="pill p-you">👤 signup</span></span>
+        <span>4 coupon-site codes <span class="pill p-bad">❌ rejected in cart</span></span>
+        <a class="buy" href="https://www.henckels.com/us/product/clad-h3-cookware-set-10-pc-stainless-steel-1023647/1023647.html">View at Henckels →</a>
+        <a href="https://www.kitchenkapers.com/products/henckels-clad-h3-10pc-stainless-steel-cookware-set">Also at Kitchen Kapers for $299.95</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="ph"><img src="{{goldi}}" alt="Goldilocks Cookware Set Plus"><span class="inset"><img src="{{goldi_saute}}" alt="Goldilocks 3.5 qt sauté pan"></span></div>
+      <div class="c-head">
+        <h3>Goldilocks Set Plus + sauté</h3>
+        <span class="meta">8-pc set + 3.5 qt sauté = 10 pc · direct</span>
+        <div class="price"><span class="big num">$370.00</span><span class="how">$275 + $95</span></div>
+      </div>
+      <div class="c-body">
+        <div class="rating"><span class="stars" style="color:var(--muted)">—</span><span>Too few independent reviews</span></div>
+        <div class="badge">ATK Best Buy · Wirecutter small-kitchen pick</div>
+        <ul class="facts">
+          <li class="plus">Only set with a 12" skillet (10" & 12")</li>
+          <li class="plus">Highest oven rating: 550°F</li>
+          <li>1.5 & 3 qt saucepans · 3.5 qt sauté · 8 qt stock · made in China</li>
+          <li class="minus">Slower to heat, lids less durable, young brand</li>
+        </ul>
+      </div>
+      <div class="c-foot">
+        <span class="lbl">Best code</span>
+        <span><code>BTASDN</code> $10 off · <code>TXCVAD</code> 10% off <span class="pill p-mute">⚪ unchecked</span></span>
+        <a class="buy" href="https://cookgoldilocks.com/products/cookware-set-plus">View Set Plus →</a>
+        <a href="https://cookgoldilocks.com/products/3-5-quart-saute-pan">View the sauté pan</a>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- PRICE CHART -->
+<section>
+  <div class="sec-head"><span class="eyebrow">Same dollar scale for every set</span><h2>Price against the benchmark</h2></div>
+  <div class="chart">
+    <div class="legend">
+      <span><i class="sw" style="background:var(--steel)"></i>Listed price</span>
+      <span><i class="sw" style="background:var(--accent)"></i>After code or offer</span>
+      <span><i class="sw" style="border-left:2px dashed var(--bad);width:2px;border-radius:0"></i>Quince $399.90</span>
+    </div>
+    <div id="rows"></div>
+    <div class="axis"><span></span><div class="ticks" id="ticks"></div></div>
+  </div>
+</section>
+
+<!-- QUICK COMPARE -->
+<section>
+  <div class="sec-head"><span class="eyebrow">Side by side</span><h2>Quick compare</h2></div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>Quince</th><th>Tramontina</th><th>Cuisinart</th><th>Henckels H3</th><th>Goldilocks</th></tr></thead>
+      <tbody>
+        <tr class="grp"><th colspan="6">Price</th></tr>
+        <tr><th>Best price</th><td class="num">$399.90</td><td class="num">$299.95</td><td class="num best">$243.46</td><td class="num">$299.99</td><td class="num">$370.00</td></tr>
+        <tr><th>Per pan</th><td class="num">$66.65</td><td class="num">$42.85</td><td class="num best">$40.58</td><td class="num">$50.00</td><td class="num">$61.67</td></tr>
+        <tr class="grp"><th colspan="6">Pieces</th></tr>
+        <tr><th>Pans</th><td>6</td><td class="best">7</td><td>6 + steamer</td><td>6</td><td>6</td></tr>
+        <tr><th>Largest skillet</th><td>10"</td><td>10"</td><td>10"</td><td>10"</td><td class="best">12"</td></tr>
+        <tr><th>Total capacity</th><td class="num">16 qt</td><td class="num best">20.5 qt</td><td class="num">16 qt</td><td class="num">12 qt</td><td class="num">16 qt</td></tr>
+        <tr class="grp"><th colspan="6">Build &amp; care</th></tr>
+        <tr><th>Layers</th><td>5-ply</td><td>Tri-ply</td><td>Tri-ply</td><td>Tri-ply</td><td>Tri-ply</td></tr>
+        <tr><th>Lids</th><td>Steel</td><td>Steel</td><td>Steel</td><td>Glass</td><td>Steel</td></tr>
+        <tr><th>Oven max</th><td>500°F</td><td>500°F</td><td>500°F</td><td>500°F</td><td class="best">550°F</td></tr>
+        <tr><th>Made in</th><td>Italy</td><td>Brazil</td><td>China</td><td>Not stated</td><td>China</td></tr>
+        <tr class="grp"><th colspan="6">Reviews</th></tr>
+        <tr><th>Experts</th><td>None</td><td class="best">Wirecutter top pick</td><td>Reviewed; dropped by Wirecutter</td><td>Consumer Reports</td><td>ATK Best Buy</td></tr>
+        <tr><th>Owners</th><td>—</td><td class="best">4.5 ★</td><td>4.0 ★</td><td>Too few</td><td>Too few</td></tr>
+        <tr><th>Returns</th><td class="best">365 days</td><td>Retailer policy</td><td>Retailer policy</td><td>Retailer policy</td><td>Free returns</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4. RULED OUT -->
+<section>
+  <div class="sec-head"><span class="eyebrow">Checked and dropped</span><h2>Ruled out</h2></div>
+  <div class="outs">
+    <div class="out"><div class="ph"><img src="{{madein}}" alt="Made In 10-piece stainless set"></div><div><h3><a href="https://madeincookware.com/products/the-stainless-sets/10-piece">Made In 10-pc (5-ply)</a></h3><p><span class="num">$679</span>. America's Test Kitchen co-winner, but all 4 codes were rejected and the set excludes extra discounts.</p></div></div>
+    <div class="out"><div class="ph"><img src="{{allclad}}" alt="All-Clad D3 10-piece set"></div><div><h3><a href="https://www.all-clad.com/d3-stainless-3-ply-bonded-cookware-set-10-piece.html">All-Clad D3 10-pc</a></h3><p><span class="num">$719.99</span> with <code>BTO10</code>, which worked in the cart. Still well over $399.90.</p></div></div>
+    <div class="out"><div class="ph"><span class="noimg">No photo</span></div><div><h3><a href="https://www.costco.com/p/-/henckels-aurora-5-ply-10-piece-cookware-set/100587462">Henckels Aurora 5-ply 10-pc</a></h3><p><span class="num">$399.99</span> at Costco, 9¢ over, with no credible review. Worth watching if the price drops.</p></div></div>
+  </div>
+  <p class="lede" style="font-size:.85rem">Also dropped: Demeyere, Misen, Sardel, Viking, Hestan and Heritage Steel ($625–$1,000), plus Calphalon Premier and Caraway (no credible reviews).</p>
+</section>
+
+<!-- TIMING + WARNINGS -->
+<section class="two">
+  <div class="note">
+    <h3>Black Friday, Nov 27–30</h3>
+    <ul>
+      <li><b>Tramontina:</b> already ~25% off list. The Costco-only version (80116/003DS) is $239.99 for members, with different pieces. Its past low was $189.99.</li>
+      <li><b>Cuisinart:</b> hit about $150 at Kohl's in 2024. FRIEND20 is a certain price now, but it ends Nov 17.</li>
+      <li><b>All-Clad / Made In:</b> published Black Friday prices are $680–$900, so they won't get under $399.90.</li>
+      <li><b>Quince:</b> the set isn't discounted for Black Friday.</li>
+    </ul>
+  </div>
+  <div class="note alert">
+    <h3>Don't buy from these lookalike sites</h3>
+    <ul>
+      <li><code>surlatableus.it.com</code> is not Sur La Table.</li>
+      <li><code>zwillingshop.it.com</code> is not Zwilling.</li>
+    </ul>
+    <h3 style="color:var(--ink)">Not verified</h3>
+    <ul>
+      <li>Some prices come from search results where retailers blocked direct reading.</li>
+      <li>FRIEND20 and the Wayfair offer weren't tested in a cart.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>Sources: <a href="https://www.nytimes.com/wirecutter/reviews/best-cookware-set/">Wirecutter</a> · <a href="https://www.americastestkitchen.com/equipment_reviews/2045-cookware-set">America's Test Kitchen</a> · <a href="https://www.cnn.com/cnn-underscored/reviews/best-cookware-sets">CNN Underscored</a> · <a href="https://www.foodnetwork.com/how-to/packages/shopping/product-reviews/best-cookware-sets">Food Network</a> · <a href="https://www.consumerreports.org/home-garden/cookware/best-stainless-steel-cookware-sets-for-300-dollars-or-less-a3722854820/">Consumer Reports</a> · <a href="https://www.reviewed.com/cooking/best-right-now/best-stainless-steel-cookware-sets">Reviewed</a> · <a href="https://www.surlatable.com/20-off-friends-family-Nov26.html">FRIEND20 terms</a> · <a href="https://www.quince.com/quince-offers">Quince offers</a></p>
+  <p>Product photos come from retailer and brand pages. Owner ratings are review-count-weighted retailer stars, adjusted up to ±1 for durability and long-term feedback. Prices exclude tax.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var MAX=850, BENCH=399.90;
+  var data=[
+    {n:"Cuisinart 12-pc",list:303.45,eff:243.46,note:"FRIEND20"},
+    {n:"Henckels H3 10-pc",list:299.99,eff:254.99,note:"signup 15%"},
+    {n:"Tramontina 12-pc",list:299.95,eff:null,note:"no code"},
+    {n:"Goldilocks 10-pc",list:370,eff:null,note:"codes unchecked"},
+    {n:"Quince (benchmark)",list:399.90,eff:379.90,note:"referral",b:true},
+    {n:"Henckels Aurora",list:399.99,eff:null,f:true},
+    {n:"Made In 10-pc",list:679,eff:null,f:true},
+    {n:"All-Clad D3 10-pc",list:799.99,eff:719.99,note:"BTO10",f:true}
+  ];
+  var pct=function(v){return (v/MAX*100).toFixed(2)+"%"}, m=function(v){return "$"+v.toFixed(2)};
+  var h="";
+  data.forEach(function(d){
+    var lab=m(d.list)+(d.eff!=null?' → <b>'+m(d.eff)+'</b>':'')+(d.note?' <span style="color:var(--muted)">· '+d.note+'</span>':'');
+    h+='<div class="row'+(d.f?' faded':'')+(d.b?' benchrow':'')+'"><div class="lbl">'+d.n+'</div><div class="track">'+
+      '<div class="bar" style="width:'+pct(d.list)+'"></div>'+(d.eff!=null?'<div class="bar eff" style="width:'+pct(d.eff)+'"></div>':'')+
+      '<div class="bline" style="left:'+pct(BENCH)+'"></div><span class="val num">'+lab+'</span></div></div>';
+  });
+  document.getElementById("rows").innerHTML=h;
+  var t="";[0,200,400,600,800].forEach(function(v){t+='<span class="num" style="left:'+pct(v)+'">$'+v+'</span>'});
+  document.getElementById("ticks").innerHTML=t;
+})();
+</script>

@@ -389,6 +389,13 @@ the best value for what you asked" or "wait 12 days," say that.
 
 ### Visual report (default for any run with 3+ finalists)
 
+**Start from `$SKILL_DIR/assets/report-template.html`.** It is the approved
+layout and design (a worked cookware example). Copy it, replace the content, keep
+the structure and CSS, and fill photos with
+`python3 -I $SKILL_DIR/scripts/embed_images.py page.html out.html key=img.jpg …`.
+Adapt the labels to the category (e.g. "Pieces" → "Specs" for electronics).
+Don't redesign it unless the user asks.
+
 Publish one unified HTML page (Artifact tool) and give the link alongside a short chat summary. Read it top to
 bottom in these groups:
 1. **Answer**: 2–3 lines (buy · cheapest · the key caveat).
@@ -432,3 +439,5 @@ image of a look-alike variant.
 - `references/deal-timing.md`: sale calendar, historical-price sources, SKU-drift traps
 - `references/subagent-briefs.md`: copy-ready prompts for each fan-out stage
 - `scripts/firecrawl.sh`: Firecrawl search/scrape wrapper (from shop-scout, MIT)
+- `assets/report-template.html`: the approved visual report (worked example)
+- `scripts/embed_images.py`: resizes photos and embeds them into the report's `{{key}}` slots
