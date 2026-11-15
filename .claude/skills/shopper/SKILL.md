@@ -440,4 +440,4 @@ image of a look-alike variant.
 - `references/subagent-briefs.md`: copy-ready prompts for each fan-out stage
 - `scripts/firecrawl.sh`: Firecrawl search/scrape wrapper (from shop-scout, MIT)
 - `assets/report-template.html`: the approved visual report (worked example)
-- `scripts/embed_images.py`: resizes photos and embeds them into the report's `{{key}}` slots
+- `scripts/embed_images.py`: resizes photos and embeds them into the report's double-brace photo slots

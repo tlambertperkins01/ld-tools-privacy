@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fill {{key}} image placeholders in a /shopper report with embedded WebP data URIs.
+"""Fill double-brace image placeholders in a /shopper report with embedded WebP data URIs.
 
 Usage:
   python3 -I embed_images.py <page.html> <out.html> key=path/to/image.jpg [key=...]

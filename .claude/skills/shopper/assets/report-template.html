@@ -4,7 +4,7 @@
   - Keep the structure, CSS tokens, and section order: Answer → Benchmark → Finalists (cards) →
     Price chart → Quick compare → Ruled out → Timing & warnings → Sources.
   - Replace all product content. Every product name links to its exact product page.
-  - Images: {{key}} placeholders are replaced with data URIs (≈560px WebP) by a small script;
+  - Images: double-brace placeholders (e.g. the "tram" slot) are replaced with data URIs (≈560px WebP) by a small script;
     use the "No photo" placeholder (<span class="noimg">) when none is available.
   - Chart: edit the `data` array in the script (list, eff, note; b:true = benchmark; f:true = faded/ruled out)
     and set MAX to just above the highest price and BENCH to the benchmark price (or remove the line if none).
