@@ -413,6 +413,35 @@ bottom in these groups:
    verified). Don't show the banner for vague "prices may drop" claims, and
    delete the block entirely when the conditions aren't met. If waiting means losing a
    time-limited deal, say which is likely cheaper.
+
+   **When the banner is shown, offer a price watch.** Right after
+   presenting the report, ask once (AskUserQuestion) whether to create a
+   scheduled task that re-checks prices. Options: **Daily** · **Every 3 days** ·
+   **Start of each week (Monday)** · **No thanks**. If the user's time zone isn't
+   known, ask it in the same call. On a yes:
+   - Create it with the scheduled-task tool (`create_trigger`), set to start a fresh
+     session on each firing and send push notifications. Use these schedules,
+     written in the user's time zone with `CRON_TZ=`:
+     - Daily: `M H * * *`
+     - Every 3 days: `M H */3 * *`
+     - Weekly: `M H * * 1`
+
+     Pick a time outside 6–9 AM Pacific and a minute that isn't :00 or :30.
+     Every-3-days counts by day of the month, so it resets on the 1st; say so in one line.
+   - The prompt must stand on its own. Include: each finalist with its exact
+     SKU, product URL and the price/code at the time of the report · the
+     benchmark price · the target to beat · the sale dates · the user's standing
+     profile (no status discounts; links on everything). Instruct it to run a
+     lean `/shopper` re-check (pricing sweep plus code re-test, using `haiku` agents),
+     report only changes (a new low, a new code, an expired deal, out of stock),
+     and say "no change" in one line otherwise.
+   - **Auto-stop:** the prompt tells the task to disable itself
+     (`update_trigger enabled=false`) once the sale window has ended (default:
+     3 days after the event's last day) or once the user buys, and to send a
+     final summary.
+   - Confirm to the user what was created: how often, the time, and the stop date.
+     Call it a "scheduled task", never a trigger or cron job. If the tool is
+     unavailable, say so and give the user a reminder date to re-run `/shopper`.
 1. **Answer**: 2–3 lines (buy · cheapest · the key caveat).
 2. **Benchmark**: one card (if there is one).
 3. **Finalists**: one card each, all the same shape: product photo · name + model ·
