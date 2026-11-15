@@ -387,8 +387,29 @@ history; best buy is in stock; all rows are the same SKU class; only
 Be direct about trade-offs. If the honest answer is "the benchmark is already
 the best value for what you asked" or "wait 12 days," say that.
 
-For long results, offer (or, if the user will share it, publish) an HTML
-artifact version of the report.
+### Visual report (default for any run with 3+ finalists)
+
+Publish one unified HTML page (Artifact tool) and give the link alongside a short chat summary. Read it top to
+bottom in these groups:
+1. **Answer**: 2–3 lines (buy · cheapest · the key caveat).
+2. **Benchmark**: one card (if there is one).
+3. **Finalists**: one card each, all the same shape: product photo · name + model ·
+   price (struck list price, price after code) · owner ★ rating · expert badge ·
+   ★/⚠ fact bullets · best code with status pill · "View at <retailer> →" link.
+   Two columns on desktop, one on a phone.
+4. **Price chart**: every set on one dollar scale, a dashed benchmark line,
+   and listed vs after-code bars.
+5. **Quick compare**: a short table grouped as Price / Pieces / Build & care / Reviews,
+   with the best cell in each row shaded.
+6. **Ruled out**: compact rows with thumbnails and the one-line reason.
+7. **Timing and warnings**: the sale calendar, scam lookalikes, what isn't verified.
+
+**Product photos:** the page can't load images from other hosts, so download
+them and embed them. Have a `haiku` agent collect the URLs: check the product page's `og:image`, the
+Shopify `/products/<handle>.json` → `product.image.src`, then the image of the same SKU at another retailer. Check that each image shows the
+exact set (piece count, lid type). Resize to ~560px WebP and embed as data URIs
+(keep the page well under 1 MB). If none is available, show a "No photo" placeholder. Never use an
+image of a look-alike variant.
 
 ---
 
