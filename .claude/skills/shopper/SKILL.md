@@ -209,6 +209,45 @@ dead codes, and a code can be accepted yet give $0 on this item.
 
 ---
 
+## 4b. Review-rating pass (after the shortlist is narrowed)
+
+Once finalists are chosen (usually 3–6), run one more pass that rates each
+finalist **1–5 stars on the general feedback of online reviews**. This is
+separate from the editorial gate in step 1: that gate asks *do experts
+recommend it?*; this pass asks *what do owners say after living with it?*
+
+Delegate it: one `haiku` agent per 2–3 finalists collects the data, then one `sonnet` agent (or the manager) scores. Template:
+`references/subagent-briefs.md` → "Review-rating agent".
+
+**Collect per finalist (exact SKU; flag reviews of look-alike variants):**
+- Retailer star averages + review counts (Amazon, Walmart, Target, Costco,
+  brand site, specialty stores), each with its product URL and date read.
+- Editorial verdicts (from step 1) and any long-term or retest updates.
+- Owner discussion: Reddit / forums / long-term reviews. Note recurring themes.
+- Top recurring **praise** and **complaints** (aim for 3 each), with how often
+  each appears, especially durability problems (warping, pitting, rivets
+  loosening, handles, lids), QC issues, and customer-service and warranty experience.
+- Red flags: review-count spikes, incentivized/"free product" reviews, merged
+  listings (reviews from a different product), and very low counts.
+
+**Scoring rubric (show the arithmetic):**
+1. **Base** = review-count-weighted average of retailer stars, using only
+   sources with ≥ 50 reviews (fewer → note it and weight at half).
+2. **Adjust** by up to ±1.0 total, in 0.25 steps, for:
+   - durability or QC complaints recurring in ≥ 10% of negative reviews, or flagged by an editor's retest (−0.25 to −1.0);
+   - consistent long-term owner praise on Reddit/forums (+0.25 to +0.5);
+   - suspected review inflation or merged listings (−0.25 to −0.5, and say why).
+3. Round to the nearest 0.5 and display it as ★ (e.g. ★★★★☆ 4.0) with a
+   **confidence** label: High (≥ 1,000 reviews across ≥ 2 sources), Medium,
+   or Low (< 200 reviews or a single source).
+4. One line: "Owners love: …; Owners complain: …".
+
+Never invent counts or averages. A source that won't load can be cited from a
+search snippet, labelled `snippet`. If there's too little data, the rating is
+"insufficient data", not a guess. The star rating is shown in the final table
+(a "Owner rating" column) and **does not override** price or the editorial gate.
+It informs the recommendation, and a ≤ 3.0 rating must be called out.
+
 ## 5. Seller trust (shop-scout rule)
 
 Each row gets ✅ Trusted / ⚠️ Mixed / ❌ Risky + one-line reason + **source
@@ -228,8 +267,9 @@ Follow the **Operating rule** above. The stages and their tiers (templates are i
 2. **Pricing sweeps** (`haiku`, parallel, 2–3 candidates or one retailer group
    each) → raw price, stock and code tables.
 3. **Sale timing** (`haiku` to collect, or `sonnet` if it must judge SKU drift; 1 agent).
-4. **Cart verification** (`sonnet`, last, finalists only).
-5. **Manager:** prune between stages, spot-check the winner, write the report.
+4. **Review-rating pass** (`haiku` collectors in parallel, then one `sonnet` scorer; finalists only). See step 4b.
+5. **Cart verification** (`sonnet`, last, finalists only; can run in parallel with 4).
+6. **Manager:** prune between stages, spot-check the winner, write the report.
 
 Backends for reading pages, best first (announce which you used):
 1. A real browser tool (renders JS, can test carts).
@@ -266,7 +306,7 @@ Lead with the answer. Structure:
 2. **Benchmark** spec line.
 3. **Comparison table**, one row per finalist (fixed columns, fixed order):
 
-   | Product | Reviewed by (award) | Pieces / key spec | Retailer | Price | Effective price | Evidence | Promo code (label) | Trust | Buy link |
+   | Product | Reviewed by (award) | Owner rating (★, confidence) | Pieces / key spec | Retailer | Price | Effective price | Evidence | Promo code (label) | Trust | Buy link |
 
 4. **Mix-and-match** builds, with arithmetic.
 5. **Sale timing**: announced deals + historical lows + wait-or-buy call.

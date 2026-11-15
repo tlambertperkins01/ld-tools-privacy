@@ -80,6 +80,29 @@ exact message · timestamp. If a site blocks the browser, write "not tested" and
 terms page instead.
 ```
 
+## Review-rating agent: `haiku` collectors (2–3 finalists each), then a `sonnet` scorer
+
+Collector brief:
+```
+Finalists (exact SKUs + model numbers): <list with product URLs>.
+For each, collect (facts only, no scoring):
+1. Retailer star average + review count + product URL + date read (Amazon, Walmart, Target, Costco, brand site,
+   specialty stores). Flag listings that merge other variants' reviews.
+2. Editorial verdicts and any retest/long-term update (outlet, date, URL).
+3. Owner discussion: Reddit/forums/long-term reviews (2–4 links), with recurring themes.
+4. Top 3 recurring praise + top 3 recurring complaints, with a rough frequency (e.g. "~15% of 1–2★ reviews mention warping").
+5. Red flags: incentivized reviews, review spikes, very low counts.
+Search-snippet values are OK if labelled "snippet". Never invent counts.
+Return: one table per finalist + a themes list.
+```
+
+Scorer brief (`sonnet`, or the manager):
+```
+Apply the step-4b rubric in SKILL.md to these collector reports: count-weighted base (sources ≥50 reviews; smaller
+ones at half weight), ±1.0 max adjustment in 0.25 steps with stated reasons, round to 0.5, confidence label,
+and one line "Owners love: …; Owners complain: …". Show the arithmetic. If data is insufficient, say so.
+```
+
 ## Spot-check (manager, or one `sonnet` verifier)
 
 ```
