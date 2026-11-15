@@ -1,6 +1,8 @@
 # Sub-agent brief templates
 
-Each sub-agent sees only its brief. Paste the **locked brief** from SKILL.md
+The manager writes these and sends them. It does not do the legwork itself.
+Each heading gives the **model tier** to pass on the Agent tool. Launch independent
+agents in parallel in one message. Each sub-agent sees only its brief. Paste the **locked brief** from SKILL.md
 step 0 into every prompt verbatim, then add the stage-specific block. Always ask
 for a compact structured report with URLs and evidence labels.
 
@@ -22,7 +24,17 @@ Tools: load WebSearch via ToolSearch "select:WebSearch"; use WebFetch or the web
 a browser tool may be available via ToolSearch "browser".
 ```
 
-## Discovery + pricing agent (2–3 candidates each)
+## Review-sweep agent — `sonnet` (1 agent, runs first)
+
+```
+Category: <category>. Read the CURRENT roundups from the credible sources above directly (use a browser
+if fetch is blocked; otherwise use snippets and label them). For each outlet, list EVERY pick (top/budget/upgrade/also-great),
+the price shown, the review date, and a short quote. Also list picks the outlet DROPPED or WARNS AGAINST, and why.
+Reject brand blogs and listicle spam. Return: one table (outlet · pick · award · date · price shown · quote · URL)
+plus a "dropped/warned" list. Facts only. No recommendation.
+```
+
+## Pricing-sweep agent — `haiku` (parallel; 2–3 candidates or one retailer group each)
 
 ```
 Your candidates: <A>, <B>, <C>.
@@ -34,11 +46,11 @@ For survivors:
    URL, evidence label.
 4. Mix-and-match within one retailer to match the benchmark contents, with arithmetic.
 5. Promo codes for the cheapest 1–2 retailers: code, discount, exclusions, expiry, source URL,
-   label (✅ / ❔), and whether the retailer simply has no codes.
+   label (✅ / ⚠️ / 🟡 / ⚪ / 👤 / ❌ per coupon-verification.md), and whether the retailer simply has no codes (then list levers: clip coupons, gift-card discounts, price match, rebates, cashback).
 Return: a table per candidate, then notes.
 ```
 
-## Sale-timing agent (all candidates)
+## Sale-timing agent — `haiku` (`sonnet` if SKU drift needs judging; 1 agent)
 
 ```
 Sets: <list>, plus the benchmark itself.
@@ -49,14 +61,24 @@ watch for SKU drift and price errors); (3) likelihood it crosses <target> (high/
 Return: one compact table, then notes.
 ```
 
-## Cart-verification agent (finalists only, run last)
+## Cart-verification agent — `sonnet` (finalists only, runs last)
 
 ```
-Test promo codes by adding products to a cart and applying each code. Follow the cart-test protocol:
-guest only, no accounts, no email signup, no payment details, never place an order, and remove each code
-before testing the next.
+Test promo codes by adding products to a cart and applying each code. Follow the cart-test protocol in
+coupon-verification.md §3 (pasted below): guest only, no accounts, no email signup, no payment details, never place an order,
+voucher field only, at most 20 attempts per store, at most 10 guesses (small stores only, never big retailers), stop at any CAPTCHA,
+never touch private/staff codes, and remove each code before testing the next. Record the REAL discount (discount line ÷ subtotal);
+accepted-but-$0 is ⚠️.
+<paste §3 of coupon-verification.md here>
 Products/codes: <retailer, product URL, codes to test>.
 Report a table: retailer · product · code · applied/rejected/excluded · subtotal before → after ·
 exact message · timestamp. If a site blocks the browser, write "not tested" and check the official
 terms page instead.
+```
+
+## Spot-check (manager, or one `sonnet` verifier)
+
+```
+Re-open these specific URLs and confirm the live price, stock, and (if browser) the code result for the winning row(s) only:
+<URLs + expected values>. Report any mismatch with the observed value and a timestamp.
 ```

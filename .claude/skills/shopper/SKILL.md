@@ -17,12 +17,16 @@ argument-hint: "<product | benchmark URL | shopping list> [budget, must-haves, r
 
 # shopper
 
-A rigorous buying-research pipeline. It combines two things:
+A rigorous buying-research pipeline. It combines three things:
 
 - the **shop-scout** discipline (MIT, © Omar Alwahiby — see
   `scripts/LICENSE-shop-scout`): effective-price ranking, deterministic seller
   shortlists, strict coupon classification, seller-trust verdicts with sources,
   and a hard "no invented data" output gate;
+- the **promo-code-hunter** method (MIT, © mariaboger — see
+  `scripts/LICENSE-promo-code-hunter`): evidence-ranked codes, creator/
+  influencer code search, safe checkout testing with hard attempt limits, and
+  no-code levers for big retailers;
 - a **benchmark-and-review layer** proven on real research: define what
   "similar" means, admit only products credible testers recommend, sweep big +
   specialty retailers, compute mix-and-match bundles, research sale timing, and
@@ -32,6 +36,50 @@ The user's goal is a decision they can act on today, with honest confidence
 labels. Clarity over completeness: a short true answer beats a long padded one.
 
 `$SKILL_DIR` = the folder containing this file. Reference bundled files through it.
+
+---
+
+## Operating rule: the manager delegates and compiles
+
+The agent that receives `/shopper` is the **manager**. It runs on the
+expensive model, so its tokens go to judgment, not legwork.
+
+**The manager does:** lock the brief (step 0), write sub-agent briefs, decide
+who survives each stage, cross-check the few numbers that decide the winner,
+and write the final report.
+
+**The manager does not:** run broad searches, sweep retailer pages, trawl
+coupon sites, or drive carts. Each of those goes to a cheaper sub-agent.
+Its own searching budget is **about 5 direct tool calls per run**, reserved for:
+fetching the benchmark spec, spot-checking the winning price/code, and filling
+one gap no agent covered. If it is about to do a 6th search itself, it
+delegates instead.
+
+**Model tiers** (pass `model` on the Agent tool; fall back to the default if a
+tier isn't available):
+
+| Work | Tier | Why |
+|---|---|---|
+| Web searches, page fetches, price/stock extraction, aggregator code lists, historical-price lookups, retailer sweeps | `haiku` | Repetitive, high-volume, low-judgment |
+| Review screening (credible vs spam), SKU look-alike checks, sale-timing synthesis | `sonnet` | Needs judgment, but is bounded |
+| Cart testing with a browser (voucher field, safety limits) | `sonnet` | Multi-step UI work with safety rules |
+| Brief, survivor decisions, final verification, the report | manager (session model) | The decision itself |
+
+**Making cheap agents reliable:**
+- The brief is everything: the locked brief verbatim, explicit candidate list,
+  exact fields to return, evidence labels, and a return format (a table
+  schema). Narrow scope per agent: 1–3 products, or one retailer group.
+- Ask for raw facts with URLs, not recommendations. The manager recommends.
+- Run independent agents **in parallel in one message**, up to `SHOP_PARALLEL`.
+- Treat every report as a claim. Before the final answer the manager
+  re-verifies (itself, or with one `sonnet` verifier) the **winning row's**
+  price, stock, and code, and any number that flips the ranking.
+- If a haiku agent returns thin or contradictory results, re-brief it once
+  with a narrower scope, or escalate that slice to `sonnet`. Don't redo
+  it yourself.
+- Keep the user updated briefly as stages land. Don't relay raw agent dumps.
+
+Without sub-agents, run the stages sequentially yourself, using the same briefs as checklists.
 
 ---
 
@@ -87,7 +135,7 @@ direct, warehouse clubs, outlets/factory seconds). Rules (from shop-scout):
 - **Same SKU check.** Brands sell look-alike variants (different model number,
   glass vs steel lids, a "Costco exclusive" piece mix, an "Everyday" line).
   Confirm model numbers. Flag mismatches; never silently merge them.
-- **Effective price = price − applicable coupon + shipping + sourced tax/fees.**
+- **Effective price = price − ✅ coupon + shipping + sourced tax/fees.**
   Unsourced shipping is `n/a`, never assumed free.
 - **Deterministic shortlist.** Fixed retailer order (pinned → first-party/brand
   → others alphabetical), cap at `SHOP_MAX_LISTINGS` (default 6) per product,
@@ -125,35 +173,35 @@ Memorial/Labor Day, brand anniversary sales), or the user asks: follow
 
 ---
 
-## 4. Promo codes — find, classify, test
+## 4. Promo codes — find, rank, test (follow `references/coupon-verification.md`)
 
-Sources and the cart-test protocol: `references/coupon-verification.md`.
+The checkout is the source of truth. Coupon sites state wrong amounts and list
+dead codes, and a code can be accepted yet give $0 on this item.
 
-1. **Gap math first.** For each candidate, compute the discount needed to reach
-   the target: `needed % = 1 − target / price`. If no realistic code reaches it
-   (typical codes are 10–25%), say so up front instead of hunting forever.
-2. **Find** codes in this order: product page/site banner → retailer's official
-   offers/terms page → email/SMS/app first-order offers → card-linked/portal
-   cashback → aggregators (RetailMeNot, Slickdeals, Knoji, DealSpotr, Wethrift,
-   Honey) → social/influencer codes.
-3. **Classify** (shop-scout rule, unchanged):
-   - ✅ **applicable** — every condition verified (not expired, min spend met,
-     brand/category not excluded, eligibility true). Only these change
-     effective price.
-   - ❔ **unknown** — any condition unverifiable. Show as FYI, never fold in.
-   - ❌ **not applicable** — known to fail. Omit (or list under "ruled out" if
-     the user asked about it).
-4. **Test in a cart when a browser tool is available** (browser-use, Claude in
-   Chrome, built-in browser): add the item, apply the code, record subtotal
-   before/after and the exact message. Never check out, never enter payment
-   details, never create accounts or sign up for emails without the user's say-so.
-   A code that applied in a cart is labelled `cart-verified <timestamp>`.
-5. **Never stack** unless the retailer's T&Cs say so (link them).
-6. If the user requires "at least one code per option": return the best code
-   you have for each, with its honest label. If a retailer genuinely has no
-   codes (Costco, most Amazon listings use clip coupons, MAP-priced brands),
-   say that explicitly and give the nearest equivalent (clip coupon, card offer,
-   cashback portal, first-order signup %), rather than padding with a dead code.
+1. **Gap math first.** `needed % = 1 − target / price`. Above ~30%, codes
+   alone won't do it. Say so up front, and spend the effort on sales,
+   seconds, bundles and no-code levers.
+2. **Collect candidates** by evidence rank:
+   1. store shows it today;
+   2. a timestamped human check;
+   3. a creator/influencer/podcast post from the last ~60 days;
+   4. a single aggregator.
+   A code copied across aggregators is one source. Ignore auto "verified" stamps.
+   Never trust the claimed amount.
+3. **Big retailers with no public codes** (Amazon, Costco, Walmart, Target…):
+   don't guess. Use the levers instead: clip coupons, member pricing, discounted
+   gift cards, price match/adjustment, manufacturer rebates, cashback, and the
+   👤 "check your accounts" list.
+4. **Test in a cart** when a browser exists (delegate to a `sonnet` agent). Use the
+   voucher field only, at most 20 attempts per store, at most 10 guesses (small stores only), stop at
+   any CAPTCHA, and never create accounts, enter personal or payment data, or place
+   orders. Never touch private/staff/internal codes.
+5. **Labels:** ✅ works · ⚠️ accepted but $0 here · 🟡 likely · ⚪ unchecked ·
+   👤 your step · ❌ rejected. **Only ✅ changes effective price.** Never
+   stack without linked T&Cs. Every code says "verify at checkout."
+6. If the user requires "at least one code per option": give the best code
+   for each with its honest label. Where a retailer genuinely has none, say so
+   and put the best lever in that row. Never pad with a dead code.
 
 ---
 
@@ -168,17 +216,16 @@ domain has existed. No source → "insufficient data", never a guess.
 
 ## 6. Execution: fan out, then verify
 
-This research is wide. Use parallel sub-agents when the runtime has them:
+Follow the **Operating rule** above. The stages and their tiers (templates are in
+`references/subagent-briefs.md`):
 
-- **Discovery/pricing agents:** group 2–3 candidates per agent (by brand).
-  Templates in `references/subagent-briefs.md`. Each brief carries the locked
-  brief from step 0 verbatim, the credible-source list, and the evidence-label
-  rules, and asks for a compact structured report with URLs.
-- **Timing agent:** one agent for sale events across all candidates.
-- **Verification agent (last):** cart-tests codes for finalists only.
-- Synthesize yourself. Treat agent reports as claims: cross-check any number
-  that decides the winner (e.g. re-open the winning listing yourself).
-- Without sub-agents, run the same stages sequentially.
+1. **Review sweep** (`sonnet`, 1 agent): every pick from the category's credible
+   roundups, plus dropped picks → the candidate list.
+2. **Pricing sweeps** (`haiku`, parallel, 2–3 candidates or one retailer group
+   each) → raw price, stock and code tables.
+3. **Sale timing** (`haiku` to collect, or `sonnet` if it must judge SKU drift; 1 agent).
+4. **Cart verification** (`sonnet`, last, finalists only).
+5. **Manager:** prune between stages, spot-check the winner, write the report.
 
 Backends for reading pages, best first (announce which you used):
 1. A real browser tool (renders JS, can test carts).
@@ -207,7 +254,7 @@ Lead with the answer. Structure:
 4. **Mix-and-match** builds, with arithmetic.
 5. **Sale timing**: announced deals + historical lows + wait-or-buy call.
 6. **Codes table**: code · savings · conditions · source · label
-   (`cart-verified` / ✅ / ❔) · "verify at checkout".
+   (✅ / ⚠️ / 🟡 / ⚪ / 👤, with ❌ rejected listed below) · "verify at checkout".
 7. **Ruled out**: one line each (price, reviews, or spec).
 8. **Gaps**: sites that blocked you and what that leaves unverified.
 
@@ -218,7 +265,7 @@ prices actually read with sources).
 **Pre-output checklist** — every row has a sourced price, a trust verdict with
 a link, and a direct product link; no invented prices, codes, shipping, or
 history; best buy is in stock; all rows are the same SKU class; only
-✅/cart-verified codes touch effective price; nothing stacked without T&Cs.
+✅ codes touch effective price; nothing stacked without T&Cs.
 
 Be direct about trade-offs. If the honest answer is "the benchmark is already
 the best value for what you asked" or "wait 12 days," say that.
