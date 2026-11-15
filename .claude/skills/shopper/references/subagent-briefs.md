@@ -19,6 +19,8 @@ Credible review sources: Wirecutter, ATK/Cook's Illustrated, Consumer Reports, S
 CNN Underscored, Good Housekeeping, Reviewed, Food & Wine, Food Network, The Spruce Eats,
 Forbes Vetted (if tested), RTINGS (electronics). NOT brand blogs or affiliate-spam listicles.
 Evidence labels: "seen live" (page loaded), "snippet" (search result only), "stale" (>2 weeks old).
+Every price you report MUST come with the direct product-page URL (exact SKU) where you saw it; if you have none,
+write "no URL". Never construct URLs.
 Do not make purchases, create accounts, or sign up for emails. Mark anything unverified.
 EXCLUDE student, education/teacher, military/veteran, first-responder, nurse/healthcare and any ID.me/SheerID/
 UNiDAYS/GovX-verified discounts. The user does not qualify. Only report one if it needs no verification at all.

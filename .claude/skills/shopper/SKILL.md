@@ -246,6 +246,19 @@ Respect site terms; don't hammer sites; don't bypass logins or paywalls.
 
 ## 7. Output
 
+**Link rule (applies to every message, not just the final report):** every
+product you name gets a direct **product-page link** at the retailer whose price
+you quote. That includes interim progress updates, shortlists, the benchmark,
+mix-and-match pieces, ruled-out items, and Black Friday deals. Rules:
+- Link the exact SKU page, not a homepage, search page or category page. If a
+  price comes from a different retailer than the link, say so.
+- Use only URLs an agent actually loaded or got from search results. Never
+  build or guess a URL. If no product URL is known, write `(link not found)`
+  and get one from a cheap agent before the final report.
+- Sub-agents must return a product URL for every price they report (the
+  brief templates require it).
+- Mark scam/lookalike domains as warnings, never as buy links.
+
 Lead with the answer. Structure:
 
 1. **Bottom line** (2–4 lines): the recommended buy, its effective price vs the
@@ -267,7 +280,9 @@ don't print a table for it — give an honest summary (what it is, where sold,
 prices actually read with sources).
 
 **Pre-output checklist** — every row has a sourced price, a trust verdict with
-a link, and a direct product link; no invented prices, codes, shipping, or
+a link, and a direct product link; every product named anywhere in the message
+(including ruled-out items and interim updates) is linked or marked
+`(link not found)`; no invented prices, codes, shipping, or
 history; best buy is in stock; all rows are the same SKU class; only
 ✅ codes touch effective price; nothing stacked without T&Cs.
 
