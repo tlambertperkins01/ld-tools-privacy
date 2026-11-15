@@ -199,7 +199,11 @@ dead codes, and a code can be accepted yet give $0 on this item.
 5. **Labels:** ✅ works · ⚠️ accepted but $0 here · 🟡 likely · ⚪ unchecked ·
    👤 your step · ❌ rejected. **Only ✅ changes effective price.** Never
    stack without linked T&Cs. Every code says "verify at checkout."
-6. If the user requires "at least one code per option": give the best code
+6. **Never propose verified-status discounts** (student, education/teacher,
+   military/veteran, first responder, nurse/healthcare, ID.me, SheerID, UNiDAYS,
+   GovX…). The user doesn't qualify. Show one only if it needs no verification
+   at all, and then present it as an ordinary sale.
+7. If the user requires "at least one code per option": give the best code
    for each with its honest label. Where a retailer genuinely has none, say so
    and put the best lever in that row. Never pad with a dead code.
 

@@ -162,9 +162,16 @@ These are perks only the user can see. Name a program only if it fits this store
 lists or has listed the store. Give the click path where known.
 - **Card-linked offers:** Amex Offers, Chase Offers, Capital One Offers, BofA Deals.
 - **Employer perk portals:** PerksAtWork, Corporate Perks, Beneplace, Abenity.
-- **Status verification:** ID.me / SheerID (military, teacher, nurse, first
-  responder), UNiDAYS / Student Beans, AAA, AARP.
-- **Store memberships:** loyalty programs, birthday rewards, member prices.
+- **Store and club memberships:** loyalty programs, birthday rewards, member prices, AAA, AARP.
+
+**Excluded: identity- or status-verified discounts.** Do not search for, list or
+propose discounts for students, teachers or educators, military or veterans,
+first responders, nurses or healthcare workers, or anything gated by ID.me,
+SheerID, UNiDAYS, Student Beans, GovX or similar verification. The user does
+not qualify. **One exception:** if the offer is open to everyone, with no
+verification of any kind (e.g. a store-wide "Teacher Appreciation" sale anyone
+can use), show it as an ordinary sale and don't mention the group.
+Sub-agents must drop these from their reports too.
 
 Use the user's known circumstances only to rank this list. Don't speculate about accounts they may not have.
 

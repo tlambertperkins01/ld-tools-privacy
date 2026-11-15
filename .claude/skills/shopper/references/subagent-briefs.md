@@ -20,6 +20,8 @@ CNN Underscored, Good Housekeeping, Reviewed, Food & Wine, Food Network, The Spr
 Forbes Vetted (if tested), RTINGS (electronics). NOT brand blogs or affiliate-spam listicles.
 Evidence labels: "seen live" (page loaded), "snippet" (search result only), "stale" (>2 weeks old).
 Do not make purchases, create accounts, or sign up for emails. Mark anything unverified.
+EXCLUDE student, education/teacher, military/veteran, first-responder, nurse/healthcare and any ID.me/SheerID/
+UNiDAYS/GovX-verified discounts. The user does not qualify. Only report one if it needs no verification at all.
 Tools: load WebSearch via ToolSearch "select:WebSearch"; use WebFetch or the web-fetch agent;
 a browser tool may be available via ToolSearch "browser".
 ```
